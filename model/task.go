@@ -99,6 +99,24 @@ func DeleteCompletedTask(tx *sqlx.Tx) (sql.Result, error) {
 	return stmt.Exec()
 }
 
+func GetByTitle(dbx *sqlx.DB, title string) ([]Todo, error) {
+	var todos []Todo
+	rows, err := dbx.Queryx(`
+	SELECT * FROM todos WHERE title = ?
+	`, title)
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		var t Todo
+		if err := rows.StructScan(&t); err != nil {
+			return nil, err
+		}
+		todos = append(todos, t)
+	}
+	return todos, nil
+}
+
 // TodosDeleteAllはすべてのタスクを消去します。
 // テストのために使用されます。
 func TodosDeleteAll(tx *sqlx.Tx) (sql.Result, error) {

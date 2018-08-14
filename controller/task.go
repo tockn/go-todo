@@ -142,3 +142,13 @@ func (t *Todo) DeleteCompletedTask(w http.ResponseWriter, r *http.Request) error
 	}
 	return JSON(w, http.StatusOK, nil)
 }
+
+func (t *Todo) Search(w http.ResponseWriter, r *http.Request) error {
+	title := r.FormValue("title")
+
+	ts, err := model.GetByTitle(t.DB, title)
+	if err != nil {
+		return err
+	}
+	return JSON(w, http.StatusOK, ts)
+}
