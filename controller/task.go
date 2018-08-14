@@ -2,7 +2,10 @@ package controller
 
 import (
 	"encoding/json"
+	"errors"
+	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/voyagegroup/go-todo/model"
 
@@ -91,5 +94,38 @@ func (t *Todo) Delete(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (t *Todo) Toggle(w http.ResponseWriter, r *http.Request) error {
-	return JSON(w, http.StatusNotImplemented, nil)
+	if r.Header.Get("Content-Type") != "application/json" {
+		w.WriteHeader(http.StatusBadRequest)
+		return errors.New("content-type is not application/json")
+	}
+
+	length, err := strconv.Atoi(r.Header.Get("Content-Length"))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return err
+	}
+
+	body := make([]byte, length)
+	length, err = r.Body.Read(body)
+	if err != nil && err != io.EOF {
+		w.WriteHeader(http.StatusInternalServerError)
+		return err
+	}
+
+	var todo model.Todo
+	err = json.Unmarshal(body[:length], &todo)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return err
+	}
+	if err := TXHandler(t.DB, func(tx *sqlx.Tx) error {
+		_, err := todo.Toggle(tx)
+		if err != nil {
+			return err
+		}
+		return tx.Commit()
+	}); err != nil {
+		return err
+	}
+	return JSON(w, http.StatusOK, nil)
 }

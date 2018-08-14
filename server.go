@@ -79,7 +79,8 @@ func (s *Server) Route() *mux.Router {
 	router.Handle("/api/todos", handler(todo.Put)).Methods("PUT")
 	router.Handle("/api/todos", handler(todo.Post)).Methods("POST")
 	router.Handle("/api/todos", handler(todo.Delete)).Methods("DELETE")
-	router.Handle("/api/todos/toggle", handler(todo.Toggle)).Methods("PUT")
+	router.Handle("/api/todos/togle", handler(todo.Toggle)).Methods("PUT")
+	router.Handle("/api/todos/togle", handler(todo.Toggle)).Methods("POST")
 
 	// TODO return index.html
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
