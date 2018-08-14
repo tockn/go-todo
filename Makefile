@@ -1,6 +1,9 @@
 DBNAME:=treasure
 ENV:=development
 
+mysql:
+	mysql -u root -h localhost -P 3306 --protocol=tcp -p
+
 deps:
 	which dep || go get -v -u github.com/golang/dep/cmd/dep
 	dep ensure 
