@@ -73,6 +73,7 @@ func (s *Server) Route() *mux.Router {
 	}).Methods("GET")
 
 	todo := &controller.Todo{DB: s.dbx}
+	user := &controller.User{DB: s.dbx}
 
 	// TODO ng?
 	router.Handle("/api/todos", handler(todo.Get)).Methods("GET")
@@ -82,6 +83,8 @@ func (s *Server) Route() *mux.Router {
 	router.Handle("/api/todos/all", handler(todo.DeleteCompletedTask)).Methods("DELETE")
 	router.Handle("/api/todos/togle", handler(todo.Toggle)).Methods("PUT")
 	router.Handle("/api/todos/togle", handler(todo.Toggle)).Methods("POST")
+
+	router.Handle("/api/users", handler(user.GetAll)).Methods("GET")
 
 	// TODO return index.html
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
