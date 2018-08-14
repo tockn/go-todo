@@ -110,6 +110,25 @@ class TodoApp extends React.Component {
     });
   }
 
+  destroyAll() {
+    const {todos} = this.state;
+    return fetch("/api/todos/all", {
+      credentials: "same-origin",
+      method: "DELETE",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "X-CSRF-Token": this.token
+      }
+    }).then(() => {
+      this.setState({
+        todos: todos.filter(candidate => {
+            return candidate.completed === false;
+        })
+      });
+    });
+  }
+
   toggle(todoToToggle) {
     const {todos} = this.state;
 
@@ -177,6 +196,13 @@ class TodoApp extends React.Component {
         ),
       ),
       e("div", {}, e("ul", {id: "todo-list"}, this.renderTodos()),
+      ),
+      e("button", {
+        onClick: () => {
+          this.destroyAll();
+        }
+      },
+        "Delete All Completed Task"
       ),
     );
   }

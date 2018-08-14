@@ -129,3 +129,16 @@ func (t *Todo) Toggle(w http.ResponseWriter, r *http.Request) error {
 	}
 	return JSON(w, http.StatusOK, nil)
 }
+
+func (t *Todo) DeleteCompletedTask(w http.ResponseWriter, r *http.Request) error {
+	if err := TXHandler(t.DB, func(tx *sqlx.Tx) error {
+		_, err := model.DeleteCompletedTask(tx)
+		if err != nil {
+			return err
+		}
+		return tx.Commit()
+	}); err != nil {
+		return err
+	}
+	return JSON(w, http.StatusOK, nil)
+}
